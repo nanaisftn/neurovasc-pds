@@ -1,0 +1,10 @@
+- case_sensitive: false
+  exclusion_regexp: null
+  id: null
+  index_extract: 0
+  label: score_wfns
+  normalizations: []
+  regexp: (?<=wfns)\s*(iv|i+|vi*|ix|xi*|\d{1,2})\b|(?<=\bgrade)\s*(iv|i+|vi*|ix|xi*|\d{1,2})\b|(?<=wfns  \d{11})\s*(iv|i+|vi*|ix|xi*|\d)
+  term: null
+  unicode_sensitive: true
+  version: null
