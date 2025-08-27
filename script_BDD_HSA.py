@@ -487,7 +487,7 @@ def extraire_score_glasgow(table_final, con_oracle):
     
 def extraire_medicaments(codes_atc, nom_molecule , table_final, con_oracle):
     
-    """ Extraction de la première date d'administration de médicaments associé à une molécule par patient """
+    """ Extraction de la première date d'administration de médicaments associés à une molécule par patient """
     
     cursor = con_oracle.cursor()
     req = f"""select str.id_pat,min(date_data) as NOM_VAR
@@ -520,7 +520,7 @@ def extraire_actes(codes_ccam, nom_acte, table_final,con_oracle):
 def extraire_resultats_prelevements(code_labo, code_sql, nom_molecule, table_final,con_oracle):
     
     """ Extraction de la première date où le résultat du prélèvement était normal, bas ou élevé par patient,
-    date de prélèvement récupéré en priorité"""
+    date de prélèvement récupérée en priorité"""
     
     cursor = con_oracle.cursor()
     req = f""" select id_pat, min(date_data) as NOM_VAR
@@ -538,7 +538,7 @@ def extraire_resultats_prelevements(code_labo, code_sql, nom_molecule, table_fin
 
 def extraire_constantes(code_constante, code_sql, nom_constante, table_final,con_oracle):
     
-    """ Extraction de la première date où la mesure de la constante (température, pression artérielle, etc) était basse, élevé ou normal """
+    """ Extraction de la première date où la mesure de la constante (température, pression artérielle, etc) était basse, élevée ou normale """
     
     cursor = con_oracle.cursor()
     req = f"""select ess1.id_pat, min(date_data) as nom_var
@@ -596,7 +596,7 @@ def extraire_donnees_structurees(sejours_aggreges,con_oracle):
     codes_ccam = ('EABA001','EACA002','EACA003','EACA004','EACA007','EASF007','EASF010','EASF013') 
     table_final = extraire_actes(codes_ccam, 'traitement_AIC', table_final,con_oracle)
     
-    # Résultats de prélèvement , messures des constantes
+    # Résultats de prélèvements, messures des constantes
 
     # Fievre
     table_final = extraire_constantes('Temp_Autre', ' >  37.9 ', 'fievre', table_final,con_oracle)
@@ -615,7 +615,7 @@ def extraire_donnees_structurees(sejours_aggreges,con_oracle):
     table_final = extraire_resultats_prelevements( 'NA', ' > 145 ', 'NA_eleve', table_final,con_oracle)
     table_final = extraire_resultats_prelevements( 'NA', ' < 135 ', 'NA_bas', table_final,con_oracle)
     
-    # Pression de l'oxygène dnas le sang faible
+    # Pression de l'oxygène dans le sang faible
     table_final = extraire_resultats_prelevements('PO2A', ' < 10 ' , 'PA_O2_bas', table_final,con_oracle)
 
     # Taux d'hémoglobine bas
@@ -648,7 +648,7 @@ def extraire_cr_hospi_atcd(con_oracle):
 def extraire_atcd_avec_transformers(con_oracle):
     
     """ Extraction des mentions de diabète et d'hypertension artérielles dans les comptes rendus (CR) d'hospitalisation 
-    à l'aide d'un modèle de transformer """
+    à l'aide d'un modèle de transformers """
 
     cr_hospi = extraire_cr_hospi_atcd(con_oracle)
     
@@ -843,7 +843,7 @@ def coder_atcd(annotation,table_final,cr):
 
 def coder_atcd_non_familiaux(annotation,table_final,cr):
     
-    """ Codage de l'infarctus , comme c'est un antécédents souvent mentionné dans la partie antécédents familaiux la détection de contexte familial 
+    """ Codage de l'infarctus , comme c'est un antécédent souvent mentionné dans la partie antécédents familaiux la détection de contexte familial 
     permet d'exclure les mentions d'infarctus dans la partie antécédents familiaux et de ne conserver que celle lié directement au patient """
     
     table_final[annotation] = None
@@ -860,7 +860,7 @@ def coder_atcd_non_familiaux(annotation,table_final,cr):
 def coder_atcd_familiaux(annotation,table_final,cr):
     
     """ Codage d'antécédents familiaux : la détection de contexte familial permet de détecter seulement les mentions d'hémorragie sous arachoidienne 
-    ou d'accident vasculaire cérébral que l'entourage familiale du patient aurait eu """
+    ou d'accident vasculaire cérébral que l'entourage familial du patient aurait eu """
     
     table_final[annotation] = None
     for id_pat, data in cr.groupby('ID_PAT') :
@@ -873,7 +873,7 @@ def coder_atcd_familiaux(annotation,table_final,cr):
 
 def coder_evenement(annotation, table_final,cr):
     
-    """ Codage des événements se produisant durant le séjour : si le patient présente l'évênement au cours du séjour celui ci sera codé True, False sinon """
+    """ Codage des événements se produisant durant le séjour : si le patient présente l'événement au cours du séjour celui ci sera codé True, False sinon """
     
     table_final[annotation] = None
     for id_pat, data in cr.groupby('ID_PAT') :
@@ -965,7 +965,7 @@ def coder_score_glasgow(table_final, cr) :
 def coder_localisation_AIC(table_final,cr,normes_localisations) :
     
     """Codage de la localisation de l'anévrisme intracranien (AIC) rompu : la localisation la plus fréquente est récupérée,
-    en cas d'égalité la localisation  la plus probable est retenu"""
+    en cas d'égalité la localisation la plus probable est retenue"""
   
     for id_pat , data in cr.groupby('ID_PAT') :
     
@@ -996,7 +996,7 @@ def coder_localisation_AIC(table_final,cr,normes_localisations) :
             choices = ['SYLVIEN','COMMUNICANT ANTERIEUR','COMMUNICANT ANTERIEUR','COMMUNICANT ANTERIEUR','CAROTIDE INTERNE']
             localisation_AIC = str(np.select(conditions, choices))
         
-        # Autres cas la localisations la plus fréquente est retenue
+        # Autres cas : la localisations la plus fréquente est retenue
         elif frequences_localisations['freq'].max() > 0:
             
             localisation_AIC = frequences_localisations.loc[frequences_localisations[frequences_localisations['freq'] == frequences_localisations['freq'].max()].index[0], 'loc']
@@ -1007,8 +1007,8 @@ def coder_localisation_AIC(table_final,cr,normes_localisations) :
 
 def coder_type_traitement_AIC(table_final,cr) : 
     
-    """ Codage du type de traitement de l'anévrisme intracranien (AIC) rompu : seul les mentions de traitement à la forme affirmative sont retenues,
-    une concaténation des traitements mentionnées dans les comptes rendus est réalisé, en cas d'incohérence dans ces combinaisons, 
+    """ Codage du type de traitement de l'anévrisme intracranien (AIC) rompu : seul les mentions de traitement à la forme affirmative sont retenus,
+    une concaténation des traitements mentionnés dans les comptes rendus est réalisé, en cas d'incohérence dans ces combinaisons, 
     le traitement le plus probable est retenu """
         
     
@@ -1053,8 +1053,8 @@ def coder_type_traitement_AIC(table_final,cr) :
 def coder_AIC_instable(table_final,cr,normes_localisations):
 
         
-    """ Codage de l'instabilité de l'anévrisme intracranien (AIC) rompu : la recherche de localisation associés aux vocabulaires d'instabilité permet
-    de détecter les cas ou l'instabilité est associé à l'anévrisme rompu, un autre anévrisme, ou à aucune localisation précise """
+    """ Codage de l'instabilité de l'anévrisme intracranien (AIC) rompu : la recherche de localisation associé aux vocabulaires d'instabilité permet
+    de détecter les cas où l'instabilité est associée à l'anévrisme rompu, un autre anévrisme, ou à aucune localisation précise """
 
     table_final["AIC_instable"] = None
     
@@ -1099,7 +1099,7 @@ def traitement_texte(con_oracle,patients):
 
     table_final = patients[['ID_PAT']].sort_values('ID_PAT').reset_index(drop=True)
     
-    # Pipeline de traitement des antécédents réalisés sur les comptes rendus d'hospitalisation
+    # Pipeline de traitement des antécédents réalisé sur les comptes rendus d'hospitalisation
     cr_hospi_atcd = extraire_cr_hospi_atcd(con_oracle)
     
     rules_atcd = RegexpMatcher.load_rules(Path('expressions_regulieres/atcd.yml'), encoding='utf-8')
@@ -1112,7 +1112,7 @@ def traitement_texte(con_oracle,patients):
     table_final = coder_atcd_non_familiaux("infarctus",table_final,cr_hospi_atcd)
     table_final = coder_atcd_familiaux("ATCD_familiaux",table_final,cr_hospi_atcd)
     
-    # Pipeline de traitements des signes cliniques et complications non neurologiques réalisés sur les comptes rendus d'hospitalisation
+    # Pipeline de traitement des signes cliniques et complications non neurologiques réalisé sur les comptes rendus d'hospitalisation
     cr_hospi_evt = extraire_cr_hospi_evt(con_oracle)
     
     rules_evt = RegexpMatcher.load_rules(Path('expressions_regulieres/complications_non_neurologique_signes_cliniques.yml'), encoding='utf-8')
@@ -1122,7 +1122,7 @@ def traitement_texte(con_oracle,patients):
         table_final = coder_evenement(evt,table_final,cr_hospi_evt) 
 
     
-    # Pipeline de traitements des complications neurologiques réalisés sur les comptes rendus de neurologie et d'hospitalisation
+    # Pipeline de traitement des complications neurologiques réalisé sur les comptes rendus de neurologie et d'hospitalisation
     cr_hospi_neuro = extraire_cr_hospi_neuro(con_oracle)
     
     rules_evt_neuro_scores= RegexpMatcher.load_rules(Path('expressions_regulieres/complications_neurologiques_scores.yml'), encoding='utf-8')
@@ -1136,7 +1136,7 @@ def traitement_texte(con_oracle,patients):
     table_final = coder_score_glasgow(table_final,cr_hospi_neuro)
    
     
-   # Pipeline de traitements des caractéristiques de l'anévrisme rompu réalisés sur les comptes rendus de neurologie
+   # Pipeline de traitement des caractéristiques de l'anévrisme rompu réalisé sur les comptes rendus de neurologie
     cr_neuro = extraire_cr_neuro(con_oracle)
     
     rules_AIC = RegexpMatcher.load_rules(Path('expressions_regulieres/caracteristiques_AIC.yml'), encoding='utf-8')
